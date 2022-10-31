@@ -1,0 +1,309 @@
+/*
+ * Copyright (C) 2016 Tadesse Angaw
+ *
+ * This program is written by Tadesse Angaw.
+ * You can use and redistribute it without modification.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * You can contact me at tadesseangaw@gmail.com
+ */
+package com.tadesse.bahirehasab.tray;
+
+import java.awt.Color;
+import java.awt.Toolkit;
+import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
+import javax.swing.UnsupportedLookAndFeelException;
+import com.tadesse.bahirehasab.tray.tools.EthiopianCalendar;
+import java.awt.Insets;
+
+/**
+ *
+ * @author Tadesse Angaw.
+ */
+public class WidgetOne extends javax.swing.JDialog {
+
+    private static final long serialVersionUID = 1L;
+
+    EthiopianCalendar ec;
+    int Year;
+    int Month;
+    int Date;
+    boolean geez, onTop;
+    String widgetPosition;
+    Preferences root;
+
+    /**
+     * Creates new form WidgetOne
+     *
+     * @param parent
+     * @param modal
+     */
+    public WidgetOne(javax.swing.JFrame parent, boolean modal) {
+        super(parent, modal);
+        ec = new EthiopianCalendar();
+        root = Preferences.userRoot().node("bahire-hasab");
+        geez = root.getBoolean("geez", true);
+        onTop = root.getBoolean("on-top", false);
+        widgetPosition = root.get("widget-position", "right");
+
+        setUndecorated(true);
+        initComponents();
+
+        alwaysOnTop.setSelected(onTop);
+        
+        if (widgetPosition.equals("left")) {
+            left.setSelected(true);
+        } else {
+            right.setSelected(true);
+        }
+
+        setAlwaysOnTop(onTop);
+
+        new Thread() {
+            @Override
+            public void run() {
+                Calendar c = Calendar.getInstance();
+                int ethiopic[] = ec.toEthiopicDate(c);
+                Date = ec.formattedDate(ethiopic[0], ethiopic[1])[0];
+                Month = ec.formattedDate(ethiopic[0], ethiopic[1])[1];
+                Year = ec.formattedDate(ethiopic[0], ethiopic[1])[2];
+                int thisDate = 0;
+                int thisMonth = 0;
+                int thisYear = 0;
+                do {
+                    c = Calendar.getInstance();
+                    ethiopic = ec.toEthiopicDate(c);
+                    Date = ec.formattedDate(ethiopic[0], ethiopic[1])[0];
+                    Month = ec.formattedDate(ethiopic[0], ethiopic[1])[1];
+                    Year = ec.formattedDate(ethiopic[0], ethiopic[1])[2];
+                    if (thisDate != Date || thisMonth != Month || thisYear != Year) {
+                        thisDate = Date;
+                        thisMonth = Month;
+                        thisYear = Year;
+                        widgetBuilder(Date, Month, Year);
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(WidgetOne.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    c = null;
+                    ethiopic = null;
+                } while (true);
+            }
+        }.start();
+
+        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+        int taskBarHeight = scnMax.top;
+        if (widgetPosition.equals("left")) {
+            this.setLocation(0, taskBarHeight);
+        } else {
+            this.setLocation(width - getWidth(), taskBarHeight);
+        }
+
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(WidgetOne.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void widgetBuilder(int date, int month, int year) {
+
+        ec = new EthiopianCalendar();
+        dayName.setText(ec.getDayName(ec.toNumberDay(date, month, year), year));
+        if (geez) {
+            this.date.setText(ec.toEthiopicNumber(date));
+            description.setText(EthiopianCalendar.MONTHS[month - 1] + "፣ " + ec.toEthiopicNumber(Year));
+        } else {
+            this.date.setText(String.format("%d", date));
+            description.setText(EthiopianCalendar.MONTHS[month - 1] + "፣ " + Year);
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        pop1 = new javax.swing.JPopupMenu();
+        location = new javax.swing.JMenu();
+        right = new javax.swing.JRadioButtonMenuItem();
+        left = new javax.swing.JRadioButtonMenuItem();
+        change = new javax.swing.JMenuItem();
+        alwaysOnTop = new javax.swing.JCheckBoxMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        Exit = new javax.swing.JMenuItem();
+        locationGroup = new javax.swing.ButtonGroup();
+        dayName = new javax.swing.JLabel();
+        date = new javax.swing.JLabel();
+        description = new javax.swing.JLabel();
+        back = new javax.swing.JLabel();
+
+        location.setText("ቦታ");
+        location.setFont(new java.awt.Font("Ebrima", 0, 13)); // NOI18N
+
+        locationGroup.add(right);
+        right.setFont(new java.awt.Font("Ebrima", 0, 13)); // NOI18N
+        right.setSelected(true);
+        right.setText("ቀኝ");
+        right.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rightActionPerformed(evt);
+            }
+        });
+        location.add(right);
+
+        locationGroup.add(left);
+        left.setFont(new java.awt.Font("Ebrima", 0, 13)); // NOI18N
+        left.setText("ግራ");
+        left.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                leftActionPerformed(evt);
+            }
+        });
+        location.add(left);
+
+        pop1.add(location);
+
+        change.setFont(new java.awt.Font("Ebrima", 0, 13)); // NOI18N
+        change.setText("ቁጥር መቀየሪያ");
+        change.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changeActionPerformed(evt);
+            }
+        });
+        pop1.add(change);
+
+        alwaysOnTop.setFont(new java.awt.Font("Ebrima", 0, 13)); // NOI18N
+        alwaysOnTop.setText("ከላይ አስቀምጥ");
+        alwaysOnTop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                alwaysOnTopActionPerformed(evt);
+            }
+        });
+        pop1.add(alwaysOnTop);
+        pop1.add(jSeparator1);
+
+        Exit.setFont(new java.awt.Font("Ebrima", 0, 13)); // NOI18N
+        Exit.setText("መውጫ");
+        Exit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ExitActionPerformed(evt);
+            }
+        });
+        pop1.add(Exit);
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setBackground(new Color(0, 0, 0, 0));
+        setUndecorated(true);
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        dayName.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
+        dayName.setForeground(new java.awt.Color(255, 255, 255));
+        dayName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(dayName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 110, 30));
+
+        date.setFont(new java.awt.Font("Ebrima", 1, 50)); // NOI18N
+        date.setForeground(new java.awt.Color(1, 1, 1));
+        date.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        date.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        getContentPane().add(date, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 110, 60));
+
+        description.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
+        description.setForeground(new java.awt.Color(1, 1, 1));
+        description.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        getContentPane().add(description, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 110, 20));
+
+        back.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tadesse/bahirehasab/tray/resource/calendar-background-icon.png"))); // NOI18N
+        back.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                backMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                backMouseReleased(evt);
+            }
+        });
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 130, 140));
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitActionPerformed
+        root.putBoolean("is-widget-active", false);
+        dispose();
+    }//GEN-LAST:event_ExitActionPerformed
+
+    private void rightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rightActionPerformed
+        root.put("widget-position", "right");
+        widgetPosition = "right";
+        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+        int taskBarHeight = scnMax.top;
+        this.setLocation(width - getWidth(), taskBarHeight);
+    }//GEN-LAST:event_rightActionPerformed
+
+    private void leftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_leftActionPerformed
+        root.put("widget-position", "left");
+        widgetPosition = "left";
+        Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+        int taskBarHeight = scnMax.top;
+        this.setLocation(0, taskBarHeight);
+    }//GEN-LAST:event_leftActionPerformed
+
+    private void backMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backMousePressed
+        if (evt.isPopupTrigger()) {
+            pop1.show(back, evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_backMousePressed
+
+    private void backMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_backMouseReleased
+        if (evt.isPopupTrigger()) {
+            pop1.show(back, evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_backMouseReleased
+
+    private void changeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeActionPerformed
+        root.putBoolean("geez", !geez);
+        geez = !geez;
+        widgetBuilder(Date, Month, Year);
+    }//GEN-LAST:event_changeActionPerformed
+
+    private void alwaysOnTopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alwaysOnTopActionPerformed
+        root.putBoolean("on-top", !onTop);
+        this.setAlwaysOnTop(alwaysOnTop.isSelected());
+    }//GEN-LAST:event_alwaysOnTopActionPerformed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem Exit;
+    private javax.swing.JCheckBoxMenuItem alwaysOnTop;
+    private javax.swing.JLabel back;
+    private javax.swing.JMenuItem change;
+    private javax.swing.JLabel date;
+    private javax.swing.JLabel dayName;
+    private javax.swing.JLabel description;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JRadioButtonMenuItem left;
+    private javax.swing.JMenu location;
+    private javax.swing.ButtonGroup locationGroup;
+    private javax.swing.JPopupMenu pop1;
+    private javax.swing.JRadioButtonMenuItem right;
+    // End of variables declaration//GEN-END:variables
+}
